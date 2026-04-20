@@ -16,6 +16,33 @@ body {
 
 .app { max-width: 420px; margin: 0 auto; }
 
+h2 { margin-bottom: 10px; }
+
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background: white;
+}
+
+.icon-btn {
+  width: 42px;
+  height: 42px;
+  font-size: 20px;
+}
+
+#datePicker {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .task {
   display: flex;
   gap: 10px;
@@ -36,12 +63,6 @@ body {
   font-weight: bold;
 }
 
-.controls {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
 .progress {
   margin: 10px 0;
   font-size: 18px;
@@ -57,7 +78,7 @@ body {
 
   <div class="controls">
     <button onclick="goToday()">今日</button>
-    <button onclick="goYesterday()">前日</button>
+    <button onclick="openCalendar()" class="icon-btn">📅</button>
     <input type="date" id="datePicker" onchange="onDateChange(this.value)">
   </div>
 
@@ -69,7 +90,7 @@ body {
 
 <script>
 // ===== タスク =====
-const tasks = ["日記を書く", "太陽を浴びる（散歩）", "どこか1ヶ所掃除（トイレ掃除）", "朝ごはんを多めに食べる", "うんち（息子とトイレ）", "サプリ飲む（クレアチン）", "夜早く寝る"];
+const tasks = ["水を飲む", "運動", "日記"];
 
 // ===== 4時基準の日付 =====
 function getDayKey() {
@@ -81,7 +102,7 @@ function getDayKey() {
   });
 }
 
-// ===== 状態 =====
+// ===== 状態管理 =====
 let editingDateKey = getDayKey();
 
 function getState() {
@@ -178,7 +199,7 @@ function render() {
   updateDateDisplay();
 }
 
-// ===== 進捗（スキップ除外） =====
+// ===== 進捗 =====
 function updateProgress() {
   const state = getState();
 
@@ -212,21 +233,10 @@ function updateDateDisplay() {
   document.getElementById("date").textContent = formatDate(editingDateKey);
 }
 
-// ===== 日付操作 =====
-function goToday() {
-  editingDateKey = getDayKey();
-  syncPicker();
-  render();
-}
-
-function goYesterday() {
-  const d = new Date(editingDateKey);
-  d.setDate(d.getDate() - 1);
-  editingDateKey = d.toLocaleDateString("ja-JP", {
-    year:"numeric", month:"2-digit", day:"2-digit"
-  });
-  syncPicker();
-  render();
+// ===== カレンダー操作 =====
+function openCalendar() {
+  const picker = document.getElementById("datePicker");
+  picker.showPicker();
 }
 
 function onDateChange(val) {
@@ -237,6 +247,12 @@ function onDateChange(val) {
     year:"numeric", month:"2-digit", day:"2-digit"
   });
 
+  render();
+}
+
+function goToday() {
+  editingDateKey = getDayKey();
+  syncPicker();
   render();
 }
 
